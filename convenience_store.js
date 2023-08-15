@@ -1,8 +1,9 @@
 config = {
     "TIME" : 1000, // 搜索次數 (TODO: energy-based search round counter)
-    "BASE_WAIT_TIME" : 1000,  // 每次操作之間的基本間隔毫秒數
-    "SEARCH_GAP_TIME" : 2000, // 按下搜索到對事件做出回應的間隔毫秒數
-    "CALL_FOR_HELP_TIME" : 5000,  // 呼叫隊友增援以後等待幾毫秒
+    "BASE_WAIT_TIME" : 700,  // 每次操作之間的基本間隔毫秒數
+    "QUICk_WAIT_TIME" : 400, // 切換場景之間的基本間隔毫秒數 (比如撞路牌後的互動、回家再出門)
+    "SEARCH_GAP_TIME" : 1500, // 按下搜索到對事件做出回應的間隔毫秒數
+    "CALL_FOR_HELP_TIME" : 10000,  // 呼叫隊友增援以後等待幾毫秒
     "POLLING_GAP_TIME" : 3000, // 每幾毫秒重新擷取一次畫面 (不用動)
     "BATTLE_TIME" : 180000, // 預期戰鬥應該在幾毫秒內結束(超過會認定為角色死亡)，最低為POLLING_GAP_TIME秒
     "BACK_TO_BED_AFTER_DEATH" : false, // 角色判定死亡後是否回床上休息, 每人床的位置不同容易失效
@@ -22,7 +23,7 @@ function get_screen_context(){
 
 function back_to_home_then_out(){
     click(64, 1364.3);
-    sleep(config["BASE_WAIT_TIME"]);
+    sleep(config["QUICk_WAIT_TIME"]);
     click(620, 1347.3);
     sleep(config["BASE_WAIT_TIME"]);
 }
@@ -43,7 +44,14 @@ function exceed_battle_time_limit(time){
 function start_battle(){
     var battle_time_counter = 0;
     click(573, 1057);  // attack enemy
-    sleep(config["BASE_WAIT_TIME"]);
+    sleep(config["QUICk_WAIT_TIME"]);
+    var context = get_screen_context();
+    if(context.includes("勇者無畏") || context.includes("看看再說")){
+        sleep(config["QUICk_WAIT_TIME"]);
+        click(232, 997);
+    }
+
+    sleep(config["QUICk_WAIT_TIME"]);
     click(728, 1409);  // call for help
     sleep(config["CALL_FOR_HELP_TIME"]);
     click(173, 1388);   // enter the battle
@@ -93,7 +101,7 @@ function start_battle(){
 
 function start_convience_store(){
     click(573, 1057);  //open the door
-    sleep(config["BASE_WAIT_TIME"]);
+    sleep(config["QUICk_WAIT_TIME"]);
     for(var i=0; i<2; i++){
         start_battle();
     }

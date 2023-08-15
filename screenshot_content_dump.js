@@ -15,3 +15,5 @@ var context = result.text;
 log(typeof context);
 log(context)
 log(context.includes("深夜"))
+
+//可增強屬性的食物
