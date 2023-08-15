@@ -37,7 +37,7 @@ function wait_for_daytime(){
 }
 
 function exceed_battle_time_limit(round){
-    return battle_time >= config["BATTLE_TIME"]/config["POLLING_GAP_TIME"];
+    return round >= config["BATTLE_TIME"]/config["POLLING_GAP_TIME"];
 }
 
 function start_battle(){
