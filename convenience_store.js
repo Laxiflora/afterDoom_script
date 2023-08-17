@@ -61,7 +61,7 @@ function start_battle(){
         sleep(config["POLLING_GAP_TIME"]);
         battle_time_counter+=config["POLLING_GAP_TIME"];
     }
-    while(!context.includes("承受傷害") && !context.includes("治療量")  && battle_time_counter < config["BATTLE_TIME"]);
+    while(!context.includes("承受傷害") && !context.includes("治療量") && !context.includes("戰鬥勝利")  && battle_time_counter < config["BATTLE_TIME"]);
 
     if(exceed_battle_time_limit(battle_time_counter)){
         toast("戰鬥時長過久, 認定為角色死亡, 腳本結束");
@@ -113,7 +113,6 @@ function generalized_click(wid, hig){
 }
 
 function main(){
-    setScreenMetrics(1600, 900);
     var remain_search_round = config["TIME"];
     for(;remain_search_round > 0; remain_search_round--){
         toast("剩餘"+remain_search_round+"次搜索");
@@ -125,7 +124,7 @@ function main(){
         sleep(config["SEARCH_GAP_TIME"]);
     
         context = get_screen_context();
-        if(context.includes("聲,裡面應該有很多人")){ //bingo
+        if(context.includes("聲,裡面應該有很多人") || context.includes("你發現了一扇門")){ //bingo
             start_convience_store();
         }
        else{
