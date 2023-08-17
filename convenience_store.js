@@ -108,25 +108,28 @@ function start_convience_store(){
     back_to_home_then_out();
 }
 
-
-var remain_search_round = config["TIME"];
-for(;remain_search_round > 0; remain_search_round--){
-    toast("剩餘"+remain_search_round+"次搜索");
-    var context = get_screen_context();
-    if(context.includes("深夜"))
-        wait_for_daytime();
-
-    click(450, 1327);
-    sleep(config["SEARCH_GAP_TIME"]);
-
-    context = get_screen_context();
-    if(context.includes("聲,裡面應該有很多人")){ //bingo
-        start_convience_store();
+function main(){
+    setScreenMetrics(1600, 900);
+    var remain_search_round = config["TIME"];
+    for(;remain_search_round > 0; remain_search_round--){
+        toast("剩餘"+remain_search_round+"次搜索");
+        var context = get_screen_context();
+        if(context.includes("深夜"))
+            wait_for_daytime();
+    
+        click(450, 1327);
+        sleep(config["SEARCH_GAP_TIME"]);
+    
+        context = get_screen_context();
+        if(context.includes("聲,裡面應該有很多人")){ //bingo
+            start_convience_store();
+        }
+       else{
+        back_to_home_then_out();
+       }
     }
-   else{
-    back_to_home_then_out();
-   }
 }
+
 // "前方傅來一絲異常的響聲,你順著聲音找去,發現了一隻喪屍"
 // "黑暗中出现了幾隻喪屍,你還沒來得及做出反應,它就己經撲了過來"
 // "你發现了一扇門,門里停出陣陣暗鬧聲,裡面應該有很多人"
