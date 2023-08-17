@@ -113,12 +113,12 @@ function start_kill_python(){
     start_battle();
 }
 
-function generalized_click(wid, len){
-    click((wid/900*width), (len/1600*length));
+function generalized_click(wid, hig){
+    click((wid/900*width), (hig/1600*hight));
 }
 
 var width = device.width;
-var length = device.length;
+var hight = device.height;
 var remain_search_round = config["TIME"];
 for(;remain_search_round > 0; remain_search_round--){
     toast("剩餘"+remain_search_round+"次搜索");
