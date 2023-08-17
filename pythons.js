@@ -117,26 +117,29 @@ function generalized_click(wid, hig){
     click((wid/900*width), (hig/1600*hight));
 }
 
+function main(){
+    var remain_search_round = config["TIME"];
+    for(;remain_search_round > 0; remain_search_round--){
+        toast("剩餘"+remain_search_round+"次搜索");
+        var context = get_screen_context();
+        if(context.includes("深夜"))
+            wait_for_daytime();
+    
+        generalized_click(450, 1327);
+        sleep(config["SEARCH_GAP_TIME"]);
+    
+        context = get_screen_context();
+        if(context.includes("分別有一條道路,不知道通向什麼地方")){ //bingo
+            start_kill_python();
+        }
+       else{
+        back_to_home_then_out();
+       }
+    }
+}
 var width = device.width;
 var hight = device.height;
-var remain_search_round = config["TIME"];
-for(;remain_search_round > 0; remain_search_round--){
-    toast("剩餘"+remain_search_round+"次搜索");
-    var context = get_screen_context();
-    if(context.includes("深夜"))
-        wait_for_daytime();
-
-    generalized_click(450, 1327);
-    sleep(config["SEARCH_GAP_TIME"]);
-
-    context = get_screen_context();
-    if(context.includes("分別有一條道路,不知道通向什麼地方")){ //bingo
-        start_kill_python();
-    }
-   else{
-    back_to_home_then_out();
-   }
-}
+main();
 // "前方傅來一絲異常的響聲,你順著聲音找去,發現了一隻喪屍"
 // "黑暗中出现了幾隻喪屍,你還沒來得及做出反應,它就己經撲了過來"
 // "你發现了一扇門,門里停出陣陣暗鬧聲,裡面應該有很多人"
