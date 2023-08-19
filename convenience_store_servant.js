@@ -8,7 +8,8 @@ config = {
     "BATTLE_TIME" : 180000, // 預期戰鬥應該在幾毫秒內結束(超過會認定為角色死亡)，最低為POLLING_GAP_TIME秒
     "BACK_TO_BED_AFTER_DEATH" : false, // 角色判定死亡後是否回床上休息, 每人床的位置不同容易失效
     "BED_COORDINATE_X" : 587, // 角色床的位置
-    "BED_COORDINATE_Y" : 1086
+    "BED_COORDINATE_Y" : 1086,
+    "TIME_TO_WAIT_FOR_BATTLE_FINISH": 60000 // 等待主號開完2, 3輪便利的時間毫秒數 (這段時間過後會繼續搜門)
 }
 
 
@@ -102,8 +103,9 @@ function start_battle(){
 function start_convience_store(){
     generalized_click(573, 1057);  //open the door
     sleep(config["QUICk_WAIT_TIME"]);
-    for(var i=0; i<2; i++){
+    for(var i=1; i<=2; i++){
         start_battle();
+        sleep(config["TIME_TO_WAIT_FOR_BATTLE_FINISH"]/i);
     }
     back_to_home_then_out();
 }
@@ -126,8 +128,6 @@ function main(){
         context = get_screen_context();
         if(context.includes("該有很多人") || context.includes("你發現了一") || context.includes("門里") || context.includes("喧鬧聲")){ //bingo
             start_convience_store();
-            
-            sleep(60000); // 等主號打完-土炮ver.
         }
        else{
         back_to_home_then_out();

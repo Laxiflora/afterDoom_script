@@ -42,6 +42,7 @@ function exceed_battle_time_limit(time){
 }
 
 function detect_battle_status_and_leave(){
+    var battle_time_counter = 0;
     do{  //wait for the battle to finish
         toast("戰鬥中");
         var context = get_screen_context();
@@ -87,7 +88,6 @@ function detect_battle_status_and_leave(){
 }
 
 function start_battle(){
-    var battle_time_counter = 0;
     generalized_click(573, 1057);  // attack enemy
     sleep(config["QUICk_WAIT_TIME"]);
     var context = get_screen_context();
@@ -123,6 +123,7 @@ function accept_help_invitation(){
     generalized_click(604, 653);
     sleep(config['QUICk_WAIT_TIME']);
     generalized_click(756, 1404);
+    sleep(config['BASE_WAIT_TIME']);
     generalized_click(245, 928);
 }
 
