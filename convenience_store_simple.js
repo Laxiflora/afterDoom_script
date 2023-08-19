@@ -114,7 +114,7 @@ function generalized_click(wid, hig){
 
 function main(){
     var remain_search_round = config["TIME"];
-    for(;remain_search_round > 0; remain_search_round--){
+    for(remain_search_round = config["TIME"];remain_search_round > 0; remain_search_round--){
         toast("剩餘"+remain_search_round+"次搜索");
         var context = get_screen_context();
         if(context.includes("深夜"))
@@ -126,6 +126,7 @@ function main(){
         context = get_screen_context();
         if(context.includes("該有很多人") || context.includes("你發現了一") || context.includes("門里") || context.includes("喧鬧聲")){ //bingo
             start_convience_store();
+            sleep(60000); // 等主號打完-土炮ver.
         }
        else{
         back_to_home_then_out();
