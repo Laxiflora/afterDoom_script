@@ -41,20 +41,7 @@ function exceed_battle_time_limit(time){
     return time >= config["BATTLE_TIME"];
 }
 
-function start_battle(){
-    var battle_time_counter = 0;
-    generalized_click(573, 1057);  // attack enemy
-    sleep(config["QUICk_WAIT_TIME"]);
-    var context = get_screen_context();
-    if(context.includes("勇者無畏") || context.includes("看看再說")){
-        sleep(config["QUICk_WAIT_TIME"]);
-        generalized_click(232, 997);
-    }
-
-    sleep(config["QUICk_WAIT_TIME"]);
-    generalized_click(728, 1409);  // call for help
-    sleep(config["CALL_FOR_HELP_TIME"]);
-    generalized_click(173, 1388);   // enter the battle
+function detect_battle_status_and_leave(){
     do{  //wait for the battle to finish
         toast("戰鬥中");
         var context = get_screen_context();
@@ -99,6 +86,23 @@ function start_battle(){
     sleep(config["BASE_WAIT_TIME"]);
 }
 
+function start_battle(){
+    var battle_time_counter = 0;
+    generalized_click(573, 1057);  // attack enemy
+    sleep(config["QUICk_WAIT_TIME"]);
+    var context = get_screen_context();
+    if(context.includes("勇者無畏") || context.includes("看看再說")){
+        sleep(config["QUICk_WAIT_TIME"]);
+        generalized_click(232, 997);
+    }
+
+    sleep(config["QUICk_WAIT_TIME"]);
+    generalized_click(728, 1409);  // call for help
+    sleep(config["CALL_FOR_HELP_TIME"]);
+    generalized_click(173, 1388);   // enter the battle
+    detect_battle_status_and_leave();
+}
+
 function start_convience_store(){
     generalized_click(573, 1057);  //open the door
     sleep(config["QUICk_WAIT_TIME"]);
@@ -112,32 +116,48 @@ function generalized_click(wid, hig){
     click((wid/900*width), (hig/1600*hight));
 }
 
+function accept_help_invitation(){
+    generalized_click(228, 653);
+    generalized_click(354, 653);
+    generalized_click(488, 653);
+    generalized_click(604, 653);
+    sleep(config['QUICk_WAIT_TIME']);
+    generalized_click(756, 1404);
+    generalized_click(245, 928);
+}
+
+function start_new_convenience_round(){
+    // 加入隊伍-確認-等待戰鬥完成
+    accept_help_invitation();
+    detect_battle_status_and_leave();
+    sleep(config["QUICk_WAIT_TIME"]);
+    //後續行為應該一樣
+    start_convience_store();
+}
+
 function main(){
     var remain_search_round = config["TIME"];
-    for(;remain_search_round > 0; remain_search_round--){
-        toast("剩餘"+remain_search_round+"次搜索");
+    for(;;){
         var context = get_screen_context();
-        if(context.includes("深夜"))
-            wait_for_daytime();
-    
-        generalized_click(450, 1327);
-        sleep(config["SEARCH_GAP_TIME"]);
-    
-        context = get_screen_context();
-        if(context.includes("聲,裡面應該有很多人") || context.includes("你發現了一扇門")){ //bingo
-            start_convience_store();
+        if(context.includes("向你發起") && context.includes("隊友")){ // accept the invitation
+            start_new_convenience_round();
         }
-       else{
-        back_to_home_then_out();
-       }
+        else{
+            toast("等待呼叫中");
+            sleep(config["POLLING_GAP_TIME"]);
+        }
     }
 }
 
-var width = device.width;
-var hight = device.height;
+var width = device.height;
+var hight = device.width;
 main();
 
 // "前方傅來一絲異常的響聲,你順著聲音找去,發現了一隻喪屍"
 // "黑暗中出现了幾隻喪屍,你還沒來得及做出反應,它就己經撲了過來"
 // "你發现了一扇門,門里停出陣陣暗鬧聲,裡面應該有很多人"
 // "你剛剛打開門,就有個蒙面人把你包图了,他們一言不發,直接向你發起了攻擊"
+
+// 他們的裝備比之前的蒙面人看起來更加的精良
+// [系統]隊友超級浣熊向你發起戳門協助申請,位置C市郊外小鎮-使利店
+// 隊友 _ 向你發起

@@ -3,8 +3,8 @@ config = {
     "BASE_WAIT_TIME" : 700,  // 每次操作之間的基本間隔毫秒數
     "QUICk_WAIT_TIME" : 400, // 切換場景之間的基本間隔毫秒數 (比如撞路牌後的互動、回家再出門)
     "SEARCH_GAP_TIME" : 1500, // 按下搜索到對事件做出回應的間隔毫秒數
-    "CALL_FOR_HELP_TIME" : 10000,  // 呼叫隊友增援以後等待幾毫秒
-    "POLLING_GAP_TIME" : 3000, // 每幾毫秒重新擷取一次畫面 (不用動)
+    "CALL_FOR_HELP_TIME" : 5000,  // 呼叫隊友增援以後等待幾毫秒
+    "POLLING_GAP_TIME" : 3000, // 每幾毫秒重新擷取一次畫面 (不用動)P
     "BATTLE_TIME" : 180000, // 預期戰鬥應該在幾毫秒內結束(超過會認定為角色死亡)，最低為POLLING_GAP_TIME秒
     "BACK_TO_BED_AFTER_DEATH" : false, // 角色判定死亡後是否回床上休息, 每人床的位置不同容易失效
     "BED_COORDINATE_X" : 587, // 角色床的位置
@@ -45,12 +45,12 @@ function start_battle(){
     var battle_time_counter = 0;
     generalized_click(573, 1057);  // attack enemy
     sleep(config["QUICk_WAIT_TIME"]);
-
     var context = get_screen_context();
     if(context.includes("勇者無畏") || context.includes("看看再說")){
         sleep(config["QUICk_WAIT_TIME"]);
         generalized_click(232, 997);
     }
+
     sleep(config["QUICk_WAIT_TIME"]);
     generalized_click(728, 1409);  // call for help
     sleep(config["CALL_FOR_HELP_TIME"]);
@@ -99,18 +99,13 @@ function start_battle(){
     sleep(config["BASE_WAIT_TIME"]);
 }
 
-function start_kill_python(){
-    generalized_click(573, 1057); //turn left
+function start_convience_store(){
+    generalized_click(573, 1057);  //open the door
     sleep(config["QUICk_WAIT_TIME"]);
-    generalized_click(566, 954); // forward
-    sleep(config["QUICk_WAIT_TIME"]);
-    generalized_click(573, 1057); //open door
-    sleep(config["QUICk_WAIT_TIME"]);
-    generalized_click(573, 1057); //enter room
-    sleep(config["QUICk_WAIT_TIME"]);
-    generalized_click(573, 1057); //search area
-    sleep(config["QUICk_WAIT_TIME"]);
-    start_battle();
+    for(var i=0; i<2; i++){
+        start_battle();
+    }
+    back_to_home_then_out();
 }
 
 function generalized_click(wid, hig){
@@ -129,17 +124,19 @@ function main(){
         sleep(config["SEARCH_GAP_TIME"]);
     
         context = get_screen_context();
-        if(context.includes("分別有一條道路") || context.includes("知道通向什麼地方") || context.includes("向左") || context.includes("前面有一個路口")){ //bingo
-            start_kill_python();
+        if(context.includes("該有很多人") || context.includes("你發現了一") || context.includes("門里") || context.includes("喧鬧聲")){ //bingo
+            start_convience_store();
         }
        else{
         back_to_home_then_out();
        }
     }
 }
+
 var width = device.width>device.height?device.height:device.width;
 var height = device.width>device.height?device.width:device.height;
 main();
+
 // "前方傅來一絲異常的響聲,你順著聲音找去,發現了一隻喪屍"
 // "黑暗中出现了幾隻喪屍,你還沒來得及做出反應,它就己經撲了過來"
 // "你發现了一扇門,門里停出陣陣暗鬧聲,裡面應該有很多人"
