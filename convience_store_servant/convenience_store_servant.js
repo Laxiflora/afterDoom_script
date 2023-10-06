@@ -10,16 +10,27 @@ config = {
     "BED_COORDINATE_X" : 587, // 角色床的位置
     "BED_COORDINATE_Y" : 1086,
     "TIME_TO_WAIT_FOR_BATTLE_FINISH": 110000, // 等待主號開完2, 3輪便利的時間毫秒數 (這段時間過後會繼續搜門)
-    "ALLOW_SEARCH_IN_MIDNIGHT": true // 是否要深夜繼續搜索
-}
+    "ALLOW_SEARCH_IN_MIDNIGHT": false, // 是否要深夜繼續搜索
+    "folder_path": "/mnt/shared/Pictures/convience_store_servant/"
+};
 
 
-importClass(com.googlecode.tesseract.android.TessBaseAPI)
+importClass(com.googlecode.tesseract.android.TessBaseAPI);
 requestScreenCapture(false);
+var path = config["folder_path"];
+var door_img = images.read(path+"door.jpg");
+var battle_success_img = images.read(path+"win.jpg"); //
+var battle_lose_img = images.read(path+"lose.jpg");
+var midnight_img = images.read(path+"midnight.jpg");
 
-function get_screen_context(){
-    var img = captureScreen();
-    return gmlkit.ocr(img, "zh").text;;
+function get_screenshot(x_axis, y_axis, cut_x, cut_y){
+    if(x_axis==-1 || y_axis == -1){
+        return captureScreen();
+    }
+    else{
+        var img = captureScreen();
+        return images.clip(img, x_axis, y_axis, cut_x, cut_y);
+    }
 }
 
 
@@ -32,11 +43,11 @@ function back_to_home_then_out(){
 
 function wait_for_daytime(){
     do{
-        toast("深夜停搜")
-        var context = get_screen_context();
+        var img = get_screenshot(118, 180, 65, 31);
+        toast("深夜廷搜");
         sleep(5000);
     }
-    while(context.includes("深夜")) // !context.includes("[系統]天亮了,喪屍開始躲到陰影處,變得不那麼活躍了")
+    while(images.findImage(midnight_img, img)); // !context.includes("[系統]天亮了,喪屍開始躲到陰影處,變得不那麼活躍了")
 }
 
 function exceed_battle_time_limit(time){
@@ -47,11 +58,8 @@ function start_battle(){
     var battle_time_counter = 0;
     generalized_click(573, 1057);  // attack enemy
     sleep(config["QUICk_WAIT_TIME"]);
-    var context = get_screen_context();
-    if(context.includes("勇者無畏") || context.includes("看看再說")){
-        sleep(config["QUICk_WAIT_TIME"]);
-        generalized_click(232, 997);
-    }
+    generalized_click(232, 997); // press '勇者無畏' no matter the button shows up or not
+
 
     sleep(config["QUICk_WAIT_TIME"]);
     generalized_click(728, 1409);  // call for help
@@ -59,14 +67,13 @@ function start_battle(){
     generalized_click(173, 1388);   // enter the battle
     do{  //wait for the battle to finish
         toast("戰鬥中");
-        var context = get_screen_context();
+        var img = get_screenshot(355, 256, 191, 546);
         sleep(config["POLLING_GAP_TIME"]);
         battle_time_counter+=config["POLLING_GAP_TIME"];
     }
-    while(!context.includes("承受傷害") && !context.includes("治療量") && !context.includes("冶療量") && !context.includes("戰鬥勝利")  && battle_time_counter < config["BATTLE_TIME"]);
-
-    if(exceed_battle_time_limit(battle_time_counter)){
-        toast("戰鬥時長過久, 認定為角色死亡, 腳本結束");
+    while(!images.findImage(img, battle_success_img) && !images.findImage(img, battle_lose_img));
+    if(exceed_battle_time_limit(battle_time_counter) || images.findImage(img, battle_lose_img)){
+        toast("角色死亡, 腳本結束");
         if(config["BACK_TO_BED_AFTER_DEATH"]){
             generalized_click(456, 1193);
             generalized_click(460, 1197);  //battle done
@@ -86,7 +93,6 @@ function start_battle(){
         }
         exit();
     }
-
     toast("戰鬥完成");
     generalized_click(460, 1197);  //battle done
     generalized_click(460, 1216);
@@ -113,22 +119,28 @@ function generalized_click(wid, hig){
     click((wid/900*width), (hig/1600*height));
 }
 
+
 function main(){
     var remain_search_round = config["TIME"];
     for(remain_search_round = config["TIME"];remain_search_round > 0; remain_search_round--){
         toast("剩餘"+remain_search_round+"次搜索");
-        var context = get_screen_context();
-        if(context.includes("深夜") && config["ALLOW_SEARCH_IN_MIDNIGHT"] == false)
+        var img = get_screenshot(118, 180, 65, 31);  // get current time
+        if(images.findImage(midnight_img, img) && config["ALLOW_SEARCH_IN_MIDNIGHT"] == false){
             wait_for_daytime();
-    
+        }
         generalized_click(450, 1327);
         sleep(config["SEARCH_GAP_TIME"]);
-    
-        context = get_screen_context();
-        if(context.includes("該有很多人") || context.includes("你發現了一") || context.includes("門里") || context.includes("喧鬧聲")){ //bingo
+
+        img = get_screenshot(150, 793, 100, 200);   // get searched POI image
+        if(images.findImage(door_img, img)){ //bingo
             timer_end = new Date().getTime();
             toast((timer_end-timer_start));
-            sleep( (timer_end-timer_start) > config["TIME_TO_WAIT_FOR_BATTLE_FINISH"] ? 1 : config["TIME_TO_WAIT_FOR_BATTLE_FINISH"]-(timer_end-timer_start)  );
+            if(!first){
+                sleep( (timer_end-timer_start) > config["TIME_TO_WAIT_FOR_BATTLE_FINISH"] ? 1 : config["TIME_TO_WAIT_FOR_BATTLE_FINISH"]-(timer_end-timer_start)  );
+            }
+            else{
+                first = false;
+            }
             start_convience_store();
         }
        else{
@@ -141,9 +153,13 @@ var width = device.width>device.height?device.height:device.width;
 var height = device.width>device.height?device.width:device.height;
 var timer_start = new Date().getTime();
 var timer_end = new Date().getTime();
+first = true;
 main();
 
 // "前方傅來一絲異常的響聲,你順著聲音找去,發現了一隻喪屍"
 // "黑暗中出现了幾隻喪屍,你還沒來得及做出反應,它就己經撲了過來"
 // "你發现了一扇門,門里停出陣陣暗鬧聲,裡面應該有很多人"
 // "你剛剛打開門,就有個蒙面人把你包图了,他們一言不發,直接向你發起了攻擊"
+// lose: (356, 456), 189, 46
+// time: 110, 178, 80, 35
+// door: 125, 743, 190, 300

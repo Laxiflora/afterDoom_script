@@ -2,22 +2,35 @@ config = {
     "TIME" : 1000, // 搜索次數 (TODO: energy-based search round counter)
     "BASE_WAIT_TIME" : 700,  // 每次操作之間的基本間隔毫秒數
     "QUICk_WAIT_TIME" : 400, // 切換場景之間的基本間隔毫秒數 (比如撞路牌後的互動、回家再出門)
-    "SEARCH_GAP_TIME" : 1500, // 按下搜索到對事件做出回應的間隔毫秒數
+    "SEARCH_GAP_TIME" : 2500, // 按下搜索到對事件做出回應的間隔毫秒數
     "CALL_FOR_HELP_TIME" : 10000,  // 呼叫隊友增援以後等待幾毫秒
     "POLLING_GAP_TIME" : 3000, // 每幾毫秒重新擷取一次畫面 (不用動)
     "BATTLE_TIME" : 180000, // 預期戰鬥應該在幾毫秒內結束(超過會認定為角色死亡)，最低為POLLING_GAP_TIME秒
     "BACK_TO_BED_AFTER_DEATH" : false, // 角色判定死亡後是否回床上休息, 每人床的位置不同容易失效
     "BED_COORDINATE_X" : 587, // 角色床的位置
-    "BED_COORDINATE_Y" : 1086
+    "BED_COORDINATE_Y" : 1086,
+    "folder_path": "/mnt/shared/Pictures/pythons/"
 }
 
 
 importClass(com.googlecode.tesseract.android.TessBaseAPI)
 requestScreenCapture(false);
 
-function get_screen_context(){
-    var img = captureScreen();
-    return gmlkit.ocr(img, "zh").text;;
+var path = config["folder_path"];
+var door_img = images.read(path+"door.jpg");
+var battle_success_img = images.read(path+"win.jpg"); //
+var battle_lose_img = images.read(path+"lose.jpg");
+var midnight_img = images.read(path+"midnight.jpg");
+
+
+function get_screenshot(x_axis, y_axis, cut_x, cut_y){
+    if(x_axis==-1 || y_axis == -1){
+        return captureScreen();
+    }
+    else{
+        var img = captureScreen();
+        return images.clip(img, x_axis, y_axis, cut_x, cut_y);
+    }
 }
 
 
@@ -30,11 +43,10 @@ function back_to_home_then_out(){
 
 function wait_for_daytime(){
     do{
-        toast("深夜停搜")
-        var context = get_screen_context();
+        var img = get_screenshot(118, 180, 65, 31);
         sleep(5000);
     }
-    while(context.includes("深夜")) // !context.includes("[系統]天亮了,喪屍開始躲到陰影處,變得不那麼活躍了")
+    while(images.findImage(midnight_img, img)); // !context.includes("[系統]天亮了,喪屍開始躲到陰影處,變得不那麼活躍了")
 }
 
 function exceed_battle_time_limit(time){
@@ -45,26 +57,22 @@ function start_battle(){
     var battle_time_counter = 0;
     generalized_click(573, 1057);  // attack enemy
     sleep(config["QUICk_WAIT_TIME"]);
+    generalized_click(232, 997); // press '勇者無畏' no matter the button shows up or not
 
-    var context = get_screen_context();
-    if(context.includes("勇者無畏") || context.includes("看看再說")){
-        sleep(config["QUICk_WAIT_TIME"]);
-        generalized_click(232, 997);
-    }
+
     sleep(config["QUICk_WAIT_TIME"]);
     generalized_click(728, 1409);  // call for help
     sleep(config["CALL_FOR_HELP_TIME"]);
     generalized_click(173, 1388);   // enter the battle
     do{  //wait for the battle to finish
         toast("戰鬥中");
-        var context = get_screen_context();
+        var img = get_screenshot(355, 256, 191, 546);
         sleep(config["POLLING_GAP_TIME"]);
         battle_time_counter+=config["POLLING_GAP_TIME"];
     }
-    while(!context.includes("承受傷害") && !context.includes("治療量") && !context.includes("冶療量") && !context.includes("戰鬥勝利")  && battle_time_counter < config["BATTLE_TIME"]);
-
-    if(exceed_battle_time_limit(battle_time_counter)){
-        toast("戰鬥時長過久, 認定為角色死亡, 腳本結束");
+    while(!images.findImage(img, battle_success_img) && !images.findImage(img, battle_lose_img));
+    if(exceed_battle_time_limit(battle_time_counter) || images.findImage(img, battle_lose_img)){
+        toast("角色死亡, 腳本結束");
         if(config["BACK_TO_BED_AFTER_DEATH"]){
             generalized_click(456, 1193);
             generalized_click(460, 1197);  //battle done
@@ -84,7 +92,6 @@ function start_battle(){
         }
         exit();
     }
-
     toast("戰鬥完成");
     generalized_click(460, 1197);  //battle done
     generalized_click(460, 1216);
@@ -120,20 +127,19 @@ function generalized_click(wid, hig){
 function main(){
     var remain_search_round = config["TIME"];
     for(;remain_search_round > 0; remain_search_round--){
-        toast("剩餘"+remain_search_round+"次搜索");
-        var context = get_screen_context();
-        if(context.includes("深夜"))
+        var img = get_screenshot(118, 180, 65, 31);  // get current time
+        if(images.findImage(midnight_img, img) && config["ALLOW_SEARCH_IN_MIDNIGHT"] == false){
             wait_for_daytime();
-    
+        }
         generalized_click(450, 1327);
         sleep(config["SEARCH_GAP_TIME"]);
     
-        context = get_screen_context();
-        if(context.includes("分別有一條道路") || context.includes("知道通向什麼地方") || context.includes("向左") || context.includes("前面有一個路口")){ //bingo
+        img = get_screenshot(150, 793, 100, 200);   // get searched POI image
+        if(images.findImage(door_img, img)){ //bingo
             start_kill_python();
         }
        else{
-        back_to_home_then_out();
+            back_to_home_then_out();
        }
     }
 }
@@ -144,3 +150,6 @@ main();
 // "黑暗中出现了幾隻喪屍,你還沒來得及做出反應,它就己經撲了過來"
 // "你發现了一扇門,門里停出陣陣暗鬧聲,裡面應該有很多人"
 // "你剛剛打開門,就有個蒙面人把你包图了,他們一言不發,直接向你發起了攻擊"
+// lose: (356, 456), 189, 46
+// time: 110, 178, 80, 35
+// door: 125, 743, 190, 300

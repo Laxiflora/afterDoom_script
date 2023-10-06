@@ -137,7 +137,6 @@ function start_new_convenience_round(){
 }
 
 function main(){
-    var remain_search_round = config["TIME"];
     for(;;){
         var context = get_screen_context();
         if(context.includes("向你發起") && context.includes("隊友")){ // accept the invitation
