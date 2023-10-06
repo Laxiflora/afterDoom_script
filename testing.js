@@ -8,9 +8,12 @@ function get_screenshot(  ){
 
 var path = "/mnt/shared/Pictures/convience_store_servant/";
 var cap = get_screenshot();
-var _true = images.read(path+"sssss.jpg");
-var _orig = images.read(path+"win.jpg");
+var _true = images.read(path+"why.jpg");
+var _orig = images.read(path+"lose.jpg");
 
+_true = images.grayscale(_true);
+_orig = images.grayscale(_orig);
+images.save(_true, path+"gray_why.jpg", "jpg", 100);
 
 if(images.findImage(_true, _orig)){
     toast("A");

@@ -8,5 +8,5 @@ function get_screenshot(){
 
 var path = "/mnt/shared/Pictures/convience_store_servant/";
 var img = get_screenshot();
-img = images.clip(img, 387, 330, 119, 14);
-images.save(img, path+"win.jpg", "jpg", 100);
+img = images.clip(img, 305, 96, 291, 896);
+images.save(img, path+"why.jpg", "jpg", 100);
