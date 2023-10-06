@@ -118,8 +118,11 @@ function generalized_click(wid, hig){
 
 function accept_help_invitation(){
     generalized_click(228, 653);
+    sleep(config['QUICk_WAIT_TIME']);
     generalized_click(354, 653);
+    sleep(config['QUICk_WAIT_TIME']);
     generalized_click(488, 653);
+    sleep(config['QUICk_WAIT_TIME']);
     generalized_click(604, 653);
     sleep(config['QUICk_WAIT_TIME']);
     generalized_click(756, 1404);
@@ -149,8 +152,8 @@ function main(){
     }
 }
 
-var width = device.height;
-var hight = device.width;
+var width = device.width>device.height?device.height:device.width;
+var hight = device.width>device.height?device.width:device.height;
 main();
 
 // "前方傅來一絲異常的響聲,你順著聲音找去,發現了一隻喪屍"
