@@ -2,7 +2,7 @@ config = {
     "TIME" : 1000, // 搜索次數 (TODO: energy-based search round counter)
     "BASE_WAIT_TIME" : 700,  // 每次操作之間的基本間隔毫秒數
     "QUICk_WAIT_TIME" : 400, // 切換場景之間的基本間隔毫秒數 (比如撞路牌後的互動、回家再出門)
-    "SEARCH_GAP_TIME" : 1500, // 按下搜索到對事件做出回應的間隔毫秒數
+    "SEARCH_GAP_TIME" : 2500, // 按下搜索到對事件做出回應的間隔毫秒數
     "CALL_FOR_HELP_TIME" : 10000,  // 呼叫隊友增援以後等待幾毫秒
     "POLLING_GAP_TIME" : 3000, // 每幾毫秒重新擷取一次畫面 (不用動)
     "BATTLE_TIME" : 180000, // 預期戰鬥應該在幾毫秒內結束(超過會認定為角色死亡)，最低為POLLING_GAP_TIME秒
@@ -17,7 +17,7 @@ requestScreenCapture(false);
 
 function get_screen_context(){
     var img = captureScreen();
-    return gmlkit.ocr(img, "zh").text;;
+    return gmlkit.ocr(img, "zh").text;
 }
 
 
@@ -120,7 +120,6 @@ function generalized_click(wid, hig){
 function main(){
     var remain_search_round = config["TIME"];
     for(;remain_search_round > 0; remain_search_round--){
-        toast("剩餘"+remain_search_round+"次搜索");
         var context = get_screen_context();
         if(context.includes("深夜"))
             wait_for_daytime();
@@ -129,11 +128,12 @@ function main(){
         sleep(config["SEARCH_GAP_TIME"]);
     
         context = get_screen_context();
-        if(context.includes("分別有一條道路") || context.includes("知道通向什麼地方") || context.includes("向左") || context.includes("前面有一個路口")){ //bingo
+        dialogs.alert(context);
+        if(context.includes("分別有一條道路") || context.includes("道通向") || context.includes("向左") || context.includes("一個路口") || context.includes("向右") || context.includes("左右兩") || context.includes("两遺") || context.includes("向什麼地方")){ //bingo
             start_kill_python();
         }
        else{
-        back_to_home_then_out();
+            back_to_home_then_out();
        }
     }
 }
