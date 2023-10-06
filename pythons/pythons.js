@@ -66,7 +66,7 @@ function start_battle(){
     generalized_click(173, 1388);   // enter the battle
     do{  //wait for the battle to finish
         toast("戰鬥中");
-        var img = get_screenshot(355, 256, 191, 546);
+        var img = get_screenshot(305, 96, 291, 896);
         sleep(config["POLLING_GAP_TIME"]);
         battle_time_counter+=config["POLLING_GAP_TIME"];
     }
@@ -128,7 +128,7 @@ function main(){
     var remain_search_round = config["TIME"];
     for(;remain_search_round > 0; remain_search_round--){
         var img = get_screenshot(118, 180, 65, 31);  // get current time
-        if(images.findImage(midnight_img, img) && config["ALLOW_SEARCH_IN_MIDNIGHT"] == false){
+        if(images.findImage(midnight_img, img)){
             wait_for_daytime();
         }
         generalized_click(450, 1327);

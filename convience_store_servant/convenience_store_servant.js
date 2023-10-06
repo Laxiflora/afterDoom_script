@@ -2,7 +2,7 @@ config = {
     "TIME" : 1000, // 搜索次數 (TODO: energy-based search round counter)
     "BASE_WAIT_TIME" : 700,  // 每次操作之間的基本間隔毫秒數
     "QUICk_WAIT_TIME" : 400, // 切換場景之間的基本間隔毫秒數 (比如撞路牌後的互動、回家再出門)
-    "SEARCH_GAP_TIME" : 1500, // 按下搜索到對事件做出回應的間隔毫秒數
+    "SEARCH_GAP_TIME" : 2500, // 按下搜索到對事件做出回應的間隔毫秒數
     "CALL_FOR_HELP_TIME" : 15000,  // 呼叫隊友增援以後等待幾毫秒
     "POLLING_GAP_TIME" : 3000, // 每幾毫秒重新擷取一次畫面 (不用動)P
     "BATTLE_TIME" : 180000, // 預期戰鬥應該在幾毫秒內結束(超過會認定為角色死亡)，最低為POLLING_GAP_TIME秒
@@ -67,7 +67,7 @@ function start_battle(){
     generalized_click(173, 1388);   // enter the battle
     do{  //wait for the battle to finish
         toast("戰鬥中");
-        var img = get_screenshot(355, 256, 191, 546);
+        var img = get_screenshot(305, 96, 291, 896);
         sleep(config["POLLING_GAP_TIME"]);
         battle_time_counter+=config["POLLING_GAP_TIME"];
     }

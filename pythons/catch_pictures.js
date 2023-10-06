@@ -6,7 +6,7 @@ function get_screenshot(){
 }
 
 
-var path = "/mnt/shared/Pictures/pythons/";
+var path = "/mnt/shared/Pictures/convience_store_servant/";
 var img = get_screenshot();
-img = images.clip(img, 125, 743, 190, 300);
-images.save(img, path+"door.jpg", "jpg", 100);
+img = images.clip(img, 385, 325, 504, 344);
+images.save(img, path+"lose.jpg", "jpg", 100);

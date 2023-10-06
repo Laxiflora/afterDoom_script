@@ -7,7 +7,7 @@
 # 執行環境
 - [雷電模擬器9.0.59](https://www.ldplayer.tw/)
     - 螢幕解析度請設為「手機板-900x1600」，以免腳本出錯!
-![如圖]("https://github.com/Laxiflora/afterDoom_script/blob/main/environment.png")
+![如圖]("environment.png")
 
 
 ## 目前有的腳本
