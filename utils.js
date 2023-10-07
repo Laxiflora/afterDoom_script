@@ -29,10 +29,8 @@ exports.exceed_battle_time_limit = function(time){
     return time >= config["BATTLE_TIME"];
 }
 
-exports.start_battle = function(){
-    var battle_success_img = images.read(path+"gray_win.jpg"); //
-    var battle_lose_img = images.read(path+"gray_lose.jpg");
-    var battle_time_counter = 0;
+
+exports.start_fight_and_call_for_help = function(){
     generalized_click(573, 1057);  // attack enemy
     sleep(config["QUICk_WAIT_TIME"]);
     generalized_click(232, 997); // press '勇者無畏' no matter the button shows up or not
@@ -42,6 +40,12 @@ exports.start_battle = function(){
     generalized_click(728, 1409);  // call for help
     sleep(config["CALL_FOR_HELP_TIME"]);
     generalized_click(173, 1388);   // enter the battle
+}
+
+exports.detect_battle_status_and_leave = function(){
+    var battle_success_img = images.read(path+"gray_win.jpg"); //
+    var battle_lose_img = images.read(path+"gray_lose.jpg");
+    var battle_time_counter = 0;
     do{  //wait for the battle to finish
         toast("戰鬥中");
         var img = get_screenshot(305, 96, 291, 896);

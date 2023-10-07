@@ -9,14 +9,14 @@ config = {
     "BACK_TO_BED_AFTER_DEATH" : false, // 角色判定死亡後是否回床上休息, 每人床的位置不同容易失效
     "BED_COORDINATE_X" : 587, // 角色床的位置
     "BED_COORDINATE_Y" : 1086,
-    "folder_path": "/mnt/shared/Pictures/images/"
+    "image_folder_path": "/mnt/shared/Pictures/images/"
 }
 
 
 importClass(com.googlecode.tesseract.android.TessBaseAPI)
 requestScreenCapture(false);
 
-var path = config["folder_path"];
+var path = config["image_folder_path"];
 var door_img = images.read(path+"gray_python_door.jpg");
 var midnight_img = images.read(path+"gray_midnight.jpg");
 
@@ -26,7 +26,8 @@ const {
     wait_for_daytime,
     get_screenshot,
     exceed_battle_time_limit,
-    start_battle,
+    start_fight_and_call_for_help,
+    detect_battle_status_and_leave,
     generalized_click,
     search_for_target
     } = require('/mnt/shared/Pictures/utils.js');
@@ -44,7 +45,8 @@ function start_kill_python(){
     sleep(config["QUICk_WAIT_TIME"]);
     generalized_click(573, 1057); //search area
     sleep(config["QUICk_WAIT_TIME"]);
-    start_battle();
+    start_fight_and_call_for_help();
+    detect_battle_status_and_leave();
 }
 
 function main(){

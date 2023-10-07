@@ -8,7 +8,8 @@ config = {
     "BATTLE_TIME" : 180000, // 預期戰鬥應該在幾毫秒內結束(超過會認定為角色死亡)，最低為POLLING_GAP_TIME秒
     "BACK_TO_BED_AFTER_DEATH" : false, // 角色判定死亡後是否回床上休息, 每人床的位置不同容易失效
     "BED_COORDINATE_X" : 587, // 角色床的位置
-    "BED_COORDINATE_Y" : 1086
+    "BED_COORDINATE_Y" : 1086,
+    "image_folder_path": "/mnt/shared/Pictures/images/"
 }
 
 
@@ -17,15 +18,14 @@ requestScreenCapture(false);
 
 const {
     back_to_home_then_out,
-    wait_for_daytime,
     get_screenshot,
     exceed_battle_time_limit,
-    start_battle,
+    start_fight_and_call_for_help,
+    detect_battle_status_and_leave,
     generalized_click,
-    search_for_target
     } = require('/mnt/shared/Pictures/utils.js');
 
-
+var path = config["image_folder_path"];
 var battle_success_img = images.read(path+"gray_win.jpg"); //
 var battle_lose_img = images.read(path+"gray_lose.jpg");
 
@@ -40,13 +40,10 @@ function start_convience_store(){
     generalized_click(573, 1057);  //open the door
     sleep(config["QUICk_WAIT_TIME"]);
     for(var i=0; i<2; i++){
-        start_battle();
+        start_fight_and_call_for_help();
+        detect_battle_status_and_leave();
     }
     back_to_home_then_out();
-}
-
-function generalized_click(wid, hig){
-    click((wid/900*width), (hig/1600*hight));
 }
 
 function accept_help_invitation(){
@@ -62,6 +59,7 @@ function accept_help_invitation(){
     sleep(config['BASE_WAIT_TIME']);
     generalized_click(245, 928);
 }
+
 
 function start_new_convenience_round(){
     // 加入隊伍-確認-等待戰鬥完成
@@ -86,7 +84,7 @@ function main(){
 }
 
 var width = device.width>device.height?device.height:device.width;
-var hight = device.width>device.height?device.width:device.height;
+var height = device.width>device.height?device.width:device.height;
 main();
 
 // "前方傅來一絲異常的響聲,你順著聲音找去,發現了一隻喪屍"

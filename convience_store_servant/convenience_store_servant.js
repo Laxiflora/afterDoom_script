@@ -9,15 +9,15 @@ config = {
     "BACK_TO_BED_AFTER_DEATH" : false, // 角色判定死亡後是否回床上休息, 每人床的位置不同容易失效
     "BED_COORDINATE_X" : 587, // 角色床的位置
     "BED_COORDINATE_Y" : 1086,
-    "TIME_TO_WAIT_FOR_BATTLE_FINISH": 110000, // 等待主號開完2, 3輪便利的時間毫秒數 (這段時間過後會繼續搜門)
+    "TIME_TO_WAIT_FOR_BATTLE_FINISH": 90000, // 等待主號開完2, 3輪便利的時間毫秒數 (這段時間過後會繼續搜門)
     "ALLOW_SEARCH_IN_MIDNIGHT": false, // 是否要深夜繼續搜索
-    "folder_path": "/mnt/shared/Pictures/images/"
+    "image_folder_path": "/mnt/shared/Pictures/images/"
 };
 
 
 importClass(com.googlecode.tesseract.android.TessBaseAPI);
 requestScreenCapture(false);
-var path = config["folder_path"];
+var path = config["image_folder_path"];
 var door_img = images.read(path+"gray_convenience_store_door.jpg");
 var midnight_img = images.read(path+"gray_midnight.jpg");
 
@@ -27,7 +27,8 @@ const {
     wait_for_daytime,
     get_screenshot,
     exceed_battle_time_limit,
-    start_battle,
+    start_fight_and_call_for_help,
+    detect_battle_status_and_leave,
     generalized_click,
     search_for_target
     } = require('/mnt/shared/Pictures/utils.js');
@@ -36,13 +37,15 @@ const {
 function start_convience_store(){
     generalized_click(573, 1057);  //open the door
     sleep(config["QUICk_WAIT_TIME"]);
-    start_battle();
+    start_fight_and_call_for_help();
+    detect_battle_status_and_leave();
     timer_start = new Date().getTime();
     back_to_home_then_out();
 }
 
 
 function main(){
+    config["TIME_TO_WAIT_FOR_BATTLE_FINISH"] = dialogs.input("輸入童開門的間隔秒數", "90")*1000;
     var remain_search_round = config["TIME"];
     for(remain_search_round = config["TIME"];remain_search_round > 0; remain_search_round--){
         toast("剩餘"+remain_search_round+"次搜索");
