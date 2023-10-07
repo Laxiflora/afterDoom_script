@@ -22,6 +22,14 @@ var door_img = images.read(path+"gray_convenience_store_door.jpg");
 var midnight_img = images.read(path+"gray_midnight.jpg");
 
 // include functions in utils
+
+// include functions in python script
+const {
+    python_main,
+} = require('/mnt/shared/Pictures/pythons.js');
+
+toast("B");
+
 const {
     back_to_home_then_out,
     wait_for_daytime,
@@ -32,34 +40,26 @@ const {
     search_for_target
     } = require('/mnt/shared/Pictures/utils.js');
 
+toast("A");
+// include functions in convience store script
+const {
+    convience_store_main,
+} = require('/mnt/shared/Pictures/convenience_store_servant.js');
 
-function start_convience_store(){
-    generalized_click(573, 1057);  //open the door
-    sleep(config["QUICk_WAIT_TIME"]);
-    start_battle();
-    timer_start = new Date().getTime();
-    back_to_home_then_out();
+
+registered_scripts = {
+    "1": python_main,
+    "2": convience_store_main
 }
 
-
 function main(){
-    var remain_search_round = config["TIME"];
-    for(remain_search_round = config["TIME"];remain_search_round > 0; remain_search_round--){
-        toast("剩餘"+remain_search_round+"次搜索");
-        if(search_for_target()){
-            timer_end = new Date().getTime();
-            toast((timer_end-timer_start));
-            if(!first){
-                sleep( (timer_end-timer_start) > config["TIME_TO_WAIT_FOR_BATTLE_FINISH"] ? 1 : config["TIME_TO_WAIT_FOR_BATTLE_FINISH"]-(timer_end-timer_start)  );
-            }
-            else{
-                first = false;
-            }
-            start_convience_store();
-        }
-        else{
-            back_to_home_then_out();
-        }
+    var script_options = dialogs.rawInput("選擇想要執行的腳本\n1. 打蛇\n2. 輪迴便利店");
+    if(registered_scripts.hasOwnProperty(script_options)){
+        registered_scripts[script_options]();
+    }
+    else{
+        toast("無效的輸入");
+        exit();
     }
 }
 

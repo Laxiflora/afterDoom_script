@@ -18,8 +18,6 @@ requestScreenCapture(false);
 
 var path = config["folder_path"];
 var door_img = images.read(path+"gray_python_door.jpg");
-var battle_success_img = images.read(path+"gray_win.jpg"); //
-var battle_lose_img = images.read(path+"gray_lose.jpg");
 var midnight_img = images.read(path+"gray_midnight.jpg");
 
 

@@ -30,6 +30,8 @@ exports.exceed_battle_time_limit = function(time){
 }
 
 exports.start_battle = function(){
+    var battle_success_img = images.read(path+"gray_win.jpg"); //
+    var battle_lose_img = images.read(path+"gray_lose.jpg");
     var battle_time_counter = 0;
     generalized_click(573, 1057);  // attack enemy
     sleep(config["QUICk_WAIT_TIME"]);
@@ -68,8 +70,13 @@ exports.start_battle = function(){
         }
         exit();
     }
+    battle_success_img.recycle();
+    battle_lose_img.recycle();
     toast("戰鬥完成");
-    generalized_click(460, 1197);  //battle done
+    generalized_click(460, 1127);  //battle done
+    generalized_click(460, 1147);
+    generalized_click(460, 1167);
+    generalized_click(460, 1197);
     generalized_click(460, 1216);
     generalized_click(460, 1236);
     generalized_click(460, 1256);
