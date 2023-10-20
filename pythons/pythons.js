@@ -9,6 +9,7 @@ config = {
     "BACK_TO_BED_AFTER_DEATH" : false, // 角色判定死亡後是否回床上休息, 每人床的位置不同容易失效
     "BED_COORDINATE_X" : 587, // 角色床的位置
     "BED_COORDINATE_Y" : 1086,
+    "ALLOW_SEARCH_IN_MIDNIGHT": false, // 是否要深夜繼續搜索
     "image_folder_path": "/mnt/shared/Pictures/images/"
 }
 
